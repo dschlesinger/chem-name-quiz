@@ -45,6 +45,12 @@
 
       const SMILES = Kekule.IO.saveFormatData(molecules[0], 'smi');
 
+      if (SMILES.length == 0) {
+
+        failure(`SMILES is empty :(`);
+        return
+      }
+
       const response = await fetch(
         '/api/nameChemicals',
         {

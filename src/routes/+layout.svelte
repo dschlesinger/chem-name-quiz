@@ -10,9 +10,9 @@
 
 	const pages = [
 		{name: 'Home', link: '/'},
-		{name: 'Draw To Name', link: '/draw'},
-		{name: 'Test Naming', link: '/test-name'},
-		{name: 'Test Drawing', link: '/test-draw'},
+		{name: 'Playground', link: '/playground'},
+		{name: 'Test Naming', link: '/test/name'},
+		{name: 'Test Drawing', link: '/test/draw'},
 	]
 
 </script>
