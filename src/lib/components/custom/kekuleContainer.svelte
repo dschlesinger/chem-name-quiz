@@ -10,10 +10,8 @@
   let composer;
   let loadedContainer = $state(false);
 
-  let { chemicalName } = $props();
+  let { chemicalName = $bindable() , getSMILES = $bindable({current: undefined}) } = $props();
 
-  // Init getSMILES
-  let getSMILES;
 
   onMount(async () => {
 
@@ -34,7 +32,7 @@
     loadedContainer = true;
 
     // Define get SMILES function
-    getSMILES = async () => {
+    getSMILES.current = async () => {
 
       // Should only be one molecule, return null if more or less
       const molecules = composer.exportObjs(Kekule.Molecule);
@@ -57,7 +55,13 @@
 
       const name = await response.json();
 
-      return name
+      const trueName = name?.name ?? 'Not nameable :(';
+        
+      // Both return and change $state
+      chemicalName.current = trueName;
+
+      return trueName;
+
     }
 
     return () => {
@@ -74,9 +78,3 @@ Loading Kekule ...
 {/if}
 
 <div style={`display: ${loadedContainer ? 'visible' : 'none'}; width: 600px; height: 400px; border: 1px solid #ccc;`} bind:this={container.current}></div>
-
-{#if loadedContainer}
-
-<Button onclick={async () => {const resp = await getSMILES?.(); chemicalName.current = resp.name; console.log(chemicalName.current)}}>Get Name</Button>
-
-{/if}

@@ -14,9 +14,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (!response.ok) {
 
-        console.log('response', response)
-
-        return { name: null };
+        return json({ name: null });
     }
 
     const name = await response.text();
