@@ -1,47 +1,23 @@
 <script>
-    import FitViewButton from '$lib/components/custom/fitViewButton.svelte';
-    import { SvelteFlow, SvelteFlowProvider, Background,
-             BackgroundVariant, MiniMap
-    } from '@xyflow/svelte';
-    import '@xyflow/svelte/dist/style.css';
+  import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import { warning } from '$lib/components/custom/toasts.svelte';
 
-    import AtomNode from '$lib/components/custom/nodes/atomNode.svelte';
+  let chemicalName = $state({current: ''});
+  let getSMILES = $state({current: null})
 
-    let nodes = $state.raw([
-        {
-            id: '1',
-            type: 'AtomNode',
-            position: { x: 0, y: 0 },
-            data: { label: 'Hello' },
-        },
-        {
-            id: '2',
-            type: 'AtomNode',
-            position: { x: 100, y: 100 },
-            data: { label: 'World' },
-        },
-    ]);
+   let isLoading = $state(false);
 
-    let edges = $state.raw([{ id: 'e1-2', source: '1', target: '2' }]);
-
-    const nodeTypes = { AtomNode: AtomNode };
+  let onclickGetName = $derived(getSMILES.current ? (async () => {isLoading = true; getSMILES.current?.(); isLoading = false;}) : (async () => {warning('Naming function is not loaded')}));
 
 </script>
 
-<div class='w-screen h-screen flex justify-center items-center bg-black'>
-    <SvelteFlowProvider>
-        <div class='flex flex-col w-4/5 h-4/5'>
-            <div class='flex-1 min-h-0'>
-                <SvelteFlow class='rounded-full w-full h-full border-white border-2' 
-                    bind:nodes bind:edges {nodeTypes} fitView
-                >
-                    <Background bgColor="#000" patternColor="#93e" variant={BackgroundVariant.Dots} size={2} />
-                    <MiniMap class='rounded-2xl' maskColor='#00000030' bgColor='purple'  />
-                </SvelteFlow>
-            </div>
-            <div class='mt-4'>
-                <FitViewButton />
-            </div>
-        </div>
-    </SvelteFlowProvider>
+<div class='flex flex-col gap-y-4 items-center'>
+  <KekuleViewer bind:chemicalName bind:getSMILES />
+
+  <div class='flex gap-x-5'>
+    <Button onclick={onclickGetName} disabled={isLoading}>{isLoading ? '<i class="fa fa-spin fa-spinner"></i> Fetching...' : 'Get Name'}</Button>
+    <div class='text-center px-4 bg-slate-800 rounded-lg text-white'>Name: { chemicalName.current }</div>
+  </div>
+
 </div>
