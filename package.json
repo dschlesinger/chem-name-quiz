@@ -31,6 +31,6 @@
 	},
 	"dependencies": {
 		"@xyflow/svelte": "^1.2.4",
-		"kekule": "^1.0.3"
+		"kekule": "1.0.1"
 	}
 }

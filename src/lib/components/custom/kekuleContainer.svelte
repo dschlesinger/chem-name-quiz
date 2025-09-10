@@ -10,14 +10,13 @@
   let composer;
   let loadedContainer = $state(false);
 
-  let { chemicalName = $bindable() , getSMILES = $bindable({current: undefined}) } = $props();
+  let { chemicalName = $bindable() , getSMILES = $bindable({current: undefined}), setSMILES = $bindable({current: undefined}) } = $props();
 
 
   onMount(async () => {
 
     const { Kekule } = await import('kekule');
-    await import('kekule/theme/default');
-    
+
     console.log('Kekule version:', Kekule.VERSION);
 
     // Create a new composer widget
@@ -30,6 +29,14 @@
     composer.appendToElem(container.current);
 
     loadedContainer = true;
+
+    setSMILES.current = async () => {
+      let SMILES = 'C';
+      console.log(Kekule.IO.DataFormat.SMILES)
+      const molecule = Kekule.IO.loadFormatData(SMILES, "smi");
+      console.log(molecule)
+      composer.setChemObj(molecule);
+    }
 
     // Define get SMILES function
     getSMILES.current = async () => {
@@ -59,9 +66,9 @@
         },
       );
 
-      const name = await response.json();
+      const { name } = await response.json();
 
-      const trueName = name?.name ?? 'Not nameable :(';
+      const trueName = name ?? 'Not nameable :(';
         
       // Both return and change $state
       chemicalName.current = trueName;

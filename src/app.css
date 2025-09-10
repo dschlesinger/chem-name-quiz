@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import 'kekule/theme/default';
+@import 'kekule/dist/themes/default/kekule.css';
 
 @import "tw-animate-css";
 
