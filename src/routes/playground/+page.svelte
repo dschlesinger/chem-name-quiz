@@ -2,7 +2,7 @@
   import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { warning } from '$lib/components/custom/toasts.svelte';
-  import { Circle } from 'svelte-loading-spinners'
+  import { Circle } from 'svelte-loading-spinners';
 
   let chemicalName = $state({current: ''});
   let getSMILES = $state({current: null})

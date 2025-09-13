@@ -1,4 +1,4 @@
-<script>
+<script lang='ts'>
   import { onMount } from 'svelte';
   import { browser } from '$app/environment';
 
@@ -10,7 +10,14 @@
   let composer;
   let loadedContainer = $state(false);
 
-  let { chemicalName = $bindable() , getSMILES = $bindable({current: undefined}), setSMILES = $bindable({current: undefined}) } = $props();
+  let { 
+    width = '600px',
+    height = '400px',
+    chemicalName = $bindable(), 
+    getSMILES = $bindable({current: undefined}), 
+    clearSMILES = $bindable({current: undefined}), 
+    setSMILES = $bindable({current: undefined}) 
+  } = $props();
 
 
   onMount(async () => {
@@ -30,11 +37,33 @@
 
     loadedContainer = true;
 
-    setSMILES.current = async () => {
-      let SMILES = 'C';
-      console.log(Kekule.IO.DataFormat.SMILES)
-      const molecule = Kekule.IO.loadFormatData(SMILES, "smi");
-      console.log(molecule)
+    const smilesToMol = async (SMILES) => {
+
+      const response = await fetch(
+        '/api/smilesToMol',
+        {
+          method: 'POST',
+          body: JSON.stringify({'SMILES': SMILES})
+        },
+      );
+
+      const { mol } = await response.json();
+
+      return mol
+    }
+
+    clearSMILES.current = async () => {
+
+      composer.newDoc()
+
+    } 
+
+    setSMILES.current = async (SMILES) => {
+
+      let molData = await smilesToMol(SMILES);
+
+      const molecule = Kekule.IO.loadFormatData(molData, 'mol');
+
       composer.setChemObj(molecule);
     }
 
@@ -77,6 +106,17 @@
 
     }
 
+    composer.setCommonToolButtons(['newDoc', 'loadData', 'saveData']);
+
+    // Set displayed buttons in chem toolbar
+    composer.setChemToolButtons(['manipulate', 'erase', 'bond', 'atomAndFormula', 'ring']);
+
+    // Set available object modifiers categories
+    composer.setAllowedObjModifierCategories([
+      Kekule.Editor.ObjModifier.Category.GENERAL, Kekule.Editor.ObjModifier.Category.CHEM_STRUCTURE
+      /* Kekule.Editor.ObjModifier.Category.STYLE, Kekule.Editor.ObjModifier.Category.GLYPH */
+    ]);
+
     return () => {
       // Clean up the composer when the component is destroyed
       composer.finalize();
@@ -90,4 +130,8 @@ Loading Kekule ...
 
 {/if}
 
-<div style={`display: ${loadedContainer ? 'visible' : 'none'}; width: 600px; height: 400px; border: 1px solid #ccc;`} bind:this={container.current}></div>
+<div 
+  style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
+  bind:this={container.current}
+>
+</div>

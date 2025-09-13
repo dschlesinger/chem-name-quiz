@@ -6,26 +6,6 @@
     let getSMILES = $state({current: null})
     let setSMILES = $state({current: null})
 
-    async function generateMolecule() {
-        
-        const response = await fetch(
-        '/api/generateMolecule',
-        {
-          method: 'POST',
-          body: JSON.stringify({})
-        },
-      );
-
-      const { SMILES } = await response.json();
-
-      console.log(SMILES)
-
-      setSMILES.current?.(SMILES)
-
-    }
-
 </script>
 
 <KekuleViewer bind:chemicalName bind:getSMILES bind:setSMILES />
-
-<Button onclick={generateMolecule}>Test Generate Molecule</Button>

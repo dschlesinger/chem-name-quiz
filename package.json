@@ -30,7 +30,8 @@
 		"vite": "^7.0.4"
 	},
 	"dependencies": {
+		"@rdkit/rdkit": "^2025.3.4-1.0.0",
 		"@xyflow/svelte": "^1.2.4",
-		"kekule": "1.0.1"
+		"kekule": "^1.0.1"
 	}
 }
