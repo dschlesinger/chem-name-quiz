@@ -8,7 +8,7 @@
   import { failure, success, warning } from '$lib/components/custom/toasts.svelte';
 
   import { generateMolecule } from '$lib/kekuleUtils';
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
 
   let previousExamples = $state({current: []});
 
@@ -21,17 +21,21 @@
   let clearSMILES = $state({current: null})
   let guessedName = $state('');
 
-  let isLoading = $state(false);
+  let isLoading = $state(true);
 
   let getName = $derived(getSMILES.current ? (async () => {isLoading = true; const n = await getSMILES.current?.(); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
 
   async function setupExample() {
+
+    isLoading = true;
 
     const SMILES = await generateMolecule();
 
     await setSMILES?.current(SMILES);
 
     chemicalName.current = await getName();
+
+    isLoading = false;
   }
 
   async function checkName() {
@@ -53,7 +57,19 @@
   }
 
   onMount(async () => {
-    await setupExample();
+
+    const checkVariable = async () => {
+    if (setSMILES.current) {
+        await setupExample();
+      } else {
+
+        // 10 ms wait
+        await new Promise(resolve => setTimeout(resolve, 10));
+        await checkVariable();
+      }
+    };
+
+    await checkVariable();
   })
 
   // let onclickGetName = $derived(getSMILES.current ? (async () => {isLoading = true; await getSMILES.current?.(); isLoading = false;}) : (async () => {warning('Naming function is not loaded')}));
@@ -77,7 +93,7 @@
       </div>
       <div class='flex-1'>
         <!-- Generate new -->
-         <Button disabled={true || isLoading}>
+         <Button onclick={setupExample} disabled={isLoading}>
 
           {#if isLoading}
             <Circle size="1" color="#EEE" unit="rem" />

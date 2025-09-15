@@ -7,6 +7,34 @@
   import { success, warning, failure } from '$lib/components/custom/toasts.svelte';
   import { fail } from '@sveltejs/kit';
 
+  // Loading RDKit
+  let RDKit = null;
+  let isLoadingRDKit = false;
+
+  // Works by appending the RDKit CDN
+  async function loadRDKit() {
+        if (browser && !RDKit) {
+            isLoadingRDKit = true;
+            try {
+                // This should work in the browser
+                const script = document.createElement('script');
+                script.src = 'https://unpkg.com/@rdkit/rdkit/Code/MinimalLib/dist/RDKit_minimal.js';
+                document.head.appendChild(script);
+                
+                // Wait for script to load
+                await new Promise((resolve) => {
+                    script.onload = resolve;
+                });
+                
+                RDKit = await window.initRDKitModule();
+            } catch (error) {
+                console.error('Failed to load RDKit:', error);
+            }
+            isLoadingRDKit = false;
+        }
+    }
+    
+
   let composer;
   let loadedContainer = $state(false);
 
@@ -39,17 +67,23 @@
 
     const smilesToMol = async (SMILES) => {
 
-      const response = await fetch(
-        '/api/smilesToMol',
-        {
-          method: 'POST',
-          body: JSON.stringify({'SMILES': SMILES})
-        },
-      );
+      // Load RDKit
+      if (!RDKit) await loadRDKit();
 
-      const { mol } = await response.json();
+      const molecule = RDKit.get_mol(SMILES);
+      return molecule.get_molblock();
 
-      return mol
+      // const response = await fetch(
+      //   '/api/smilesToMol',
+      //   {
+      //     method: 'POST',
+      //     body: JSON.stringify({'SMILES': SMILES})
+      //   },
+      // );
+
+      // const { mol } = await response.json();
+
+      // return mol
     }
 
     clearSMILES.current = async () => {
