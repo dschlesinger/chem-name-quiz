@@ -5,6 +5,8 @@
   import { container } from '$lib/components/custom/container.svelte';
   import { success, warning, failure } from '$lib/components/custom/toasts.svelte';
 
+  let currentSMILES = $state({current: undefined});
+
   // Loading RDKit
   let RDKit = null;
   let isLoadingRDKit = false;
@@ -37,6 +39,7 @@
   let loadedContainer = $state(false);
 
   let { 
+    veiwProvider = 'kekule', // 'kekule' | 'rdkit'
     width = '600px',
     height = '400px',
     chemicalName = $bindable(), 
@@ -63,27 +66,6 @@
 
     loadedContainer = true;
 
-    const smilesToMol = async (SMILES) => {
-
-      // Load RDKit
-      if (!RDKit) await loadRDKit();
-
-      const molecule = RDKit.get_mol(SMILES);
-      return molecule.get_molblock();
-
-      // const response = await fetch(
-      //   '/api/smilesToMol',
-      //   {
-      //     method: 'POST',
-      //     body: JSON.stringify({'SMILES': SMILES})
-      //   },
-      // );
-
-      // const { mol } = await response.json();
-
-      // return mol
-    }
-
     clearSMILES.current = async () => {
 
       composer.newDoc()
@@ -92,12 +74,25 @@
 
     setSMILES.current = async (SMILES) => {
 
-      let molData = await smilesToMol(SMILES);
+      // Load RDKit
+      if (!RDKit) await loadRDKit();
 
-      const molecule = Kekule.IO.loadFormatData(molData, 'mol');
+      const mol = RDKit.get_mol(SMILES);
 
-      composer.setChemObj(molecule);
+      currentSMILES.current = SMILES;
 
+      if (veiwProvider == 'rkdit') {
+
+        document.getElementById('rdkit-svg-provider').innerHTML = "<div id='drawing'>" + mol.get_svg() + "</div>";
+
+      }
+      else {
+        // default to kekule
+
+          const molecule = Kekule.IO.loadFormatData(mol.get_molblock(), 'mol');
+
+          composer.setChemObj(molecule);
+      }
     }
 
     // Define get SMILES function
@@ -105,7 +100,14 @@
 
       let SMILES;
 
-      if (!givenSMILES) {
+      if (givenSMILES) {
+        // SMILES is passed in just return name for checking if it is nameable
+        SMILES = givenSMILES;
+      }
+      else if (veiwProvider == 'rdkit') {
+        SMILES = currentSMILES.current 
+      }
+      else {
 
         // Should only be one molecule, return null if more or less
         const molecules = composer.exportObjs(Kekule.Molecule);
@@ -123,10 +125,6 @@
           failure(`SMILES is empty :(`);
           return
         }
-      }
-      else {
-        // SMILES is passed in just return name for checking if it is nameable
-        SMILES = givenSMILES;
       }
 
       const response = await fetch(
@@ -148,32 +146,38 @@
 
     }
 
-    composer.setCommonToolButtons(['newDoc', 'loadData', 'saveData']);
+    if (veiwProvider == 'kekule'){
+      composer.setCommonToolButtons(['newDoc', 'loadData', 'saveData']);
 
-    // Set displayed buttons in chem toolbar
-    composer.setChemToolButtons(['manipulate', 'erase', 'bond', 'atomAndFormula', 'ring']);
+      // Set displayed buttons in chem toolbar
+      composer.setChemToolButtons(['manipulate', 'erase', 'bond', 'atomAndFormula', 'ring']);
 
-    // Set available object modifiers categories
-    composer.setAllowedObjModifierCategories([
-      Kekule.Editor.ObjModifier.Category.GENERAL, Kekule.Editor.ObjModifier.Category.CHEM_STRUCTURE
-      /* Kekule.Editor.ObjModifier.Category.STYLE, Kekule.Editor.ObjModifier.Category.GLYPH */
-    ]);
+      // Set available object modifiers categories
+      composer.setAllowedObjModifierCategories([
+        Kekule.Editor.ObjModifier.Category.GENERAL, Kekule.Editor.ObjModifier.Category.CHEM_STRUCTURE
+        /* Kekule.Editor.ObjModifier.Category.STYLE, Kekule.Editor.ObjModifier.Category.GLYPH */
+      ]);
+    }
 
     return () => {
       // Clean up the composer when the component is destroyed
-      composer.finalize();
+      if(veiwProvider == 'kekule'){composer.finalize()};
     };
   });
 </script>
 
 {#if !loadedContainer}
 
-Loading Kekule ...
+Loading {veiwProvider == 'kekule' ? 'Kekule' : 'RDKit'} ...
 
 {/if}
-
+{#if veiwProvider == 'kekule'}
 <div 
   style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
   bind:this={container.current}
 >
 </div>
+{:else}
+<!-- rdkit -->
+ <div id="rdkit-svg-provider"></div>
+{/if}
