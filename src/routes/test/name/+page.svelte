@@ -94,7 +94,7 @@
       <div class='flex-1'>
       </div>
       <div class='justify-center'>
-        <KekuleViewer bind:chemicalName bind:getSMILES bind:setSMILES bind:clearSMILES
+        <KekuleViewer veiwProvider='rdkit' bind:chemicalName bind:getSMILES bind:setSMILES bind:clearSMILES
           width='500px'
           height='300px'
         />
@@ -106,7 +106,7 @@
           {#if isLoading}
             <Circle size="1" color="#EEE" unit="rem" />
           {:else}
-            Generate New
+            New Molecule
           {/if}
         </Button>
       </div>

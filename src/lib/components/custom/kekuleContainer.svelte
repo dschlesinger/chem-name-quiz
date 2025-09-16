@@ -4,12 +4,15 @@
 
   import { container } from '$lib/components/custom/container.svelte';
   import { success, warning, failure } from '$lib/components/custom/toasts.svelte';
+  import { Circle } from 'svelte-loading-spinners';
 
   let currentSMILES = $state({current: undefined});
 
   // Loading RDKit
   let RDKit = null;
   let isLoadingRDKit = false;
+  let rdkitSVG = $state('');
+  $inspect(rdkitSVG);
 
   // Works by appending the RDKit CDN
   async function loadRDKit() {
@@ -51,7 +54,8 @@
 
   onMount(async () => {
 
-    const { Kekule } = await import('kekule');
+    if (veiwProvider == 'kekule') {
+const { Kekule } = await import('kekule');
 
     console.log('Kekule version:', Kekule.VERSION);
 
@@ -63,11 +67,11 @@
     
     // Append the composer to the container element
     composer.appendToElem(container.current);
-
-    loadedContainer = true;
+    }
 
     clearSMILES.current = async () => {
 
+      // Only works for kekule
       composer.newDoc()
 
     } 
@@ -81,9 +85,9 @@
 
       currentSMILES.current = SMILES;
 
-      if (veiwProvider == 'rkdit') {
+      if (veiwProvider == 'rdkit') {
 
-        document.getElementById('rdkit-svg-provider').innerHTML = "<div id='drawing'>" + mol.get_svg() + "</div>";
+        rdkitSVG = mol.get_svg(width=width.replace('px', ''), height=height.replace('px', ''));
 
       }
       else {
@@ -159,25 +163,37 @@
       ]);
     }
 
+    loadedContainer = true;
+
     return () => {
       // Clean up the composer when the component is destroyed
       if(veiwProvider == 'kekule'){composer.finalize()};
     };
+    
   });
 </script>
 
-{#if !loadedContainer}
+<div class='flex rounded-md items-center justify-center bg-slate-200' style={`width: ${width}; height: ${height};`} >
 
-Loading {veiwProvider == 'kekule' ? 'Kekule' : 'RDKit'} ...
+  {#if !loadedContainer}
+  <div class='flex flex-col items-center gap-y-4'>
+    <Circle color='white' />
+    <div>
+      Loading {veiwProvider == 'keule' ? 'Kekule' : 'RDKit'}...
+    </div>
+  </div>
 
-{/if}
-{#if veiwProvider == 'kekule'}
-<div 
-  style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
-  bind:this={container.current}
->
+  {/if}
+  {#if veiwProvider == 'kekule'}
+  <div 
+    style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
+    bind:this={container.current}
+  >
+  </div>
+  {:else}
+  <!-- rdkit -->
+  <div class='rounded-md overflow-hidden' id="rdkit-svg-provider" style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`}>
+    {@html rdkitSVG }
+  </div>
+  {/if}
 </div>
-{:else}
-<!-- rdkit -->
- <div id="rdkit-svg-provider"></div>
-{/if}

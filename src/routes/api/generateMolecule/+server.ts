@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { generateLinearBackbone, chooseRandom, allFuncGroups } from '$lib/functionalGroup';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const { level = 5, numberFunctionalGroups = 5 }: 
+    const { level = 1, numberFunctionalGroups = 3 }: 
         { level: number, numberFunctionalGroups: number } = await request.json();
 
     // Probability of pulling a hydrogen instead of a functional group
