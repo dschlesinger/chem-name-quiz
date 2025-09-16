@@ -10,6 +10,16 @@ export function binaryChoice(prob: number): Boolean {
     return Math.random() < prob
 }
 
+function getRingNumber(): String {
+    const n = Math.floor(Math.random() * 99);
+
+    if (n > 9) {
+        return `%${n}`
+    }
+
+    return `${n}`
+}
+
 export class functionalGroup {
 
     name: String;
@@ -18,18 +28,21 @@ export class functionalGroup {
     // attachValue, required bond level, example double to bond
     attachValue: number;
     rGroups: Array<functionalGroup>;
+    skipChance: number;
 
     constructor (
         name: String,
         SMILES: String,
         stericAvailable: number,
         attachValue: number, 
+        skipChance: number = 0,
     ) {
         this.name = name;
         this.SMILES = SMILES;
         this.stericAvailable = stericAvailable;
         this.attachValue = attachValue;
         this.rGroups = [];
+        this.skipChance = skipChance;
     }
 
     // Returns true if sucsessful false if failed probably cant attatch or smth
@@ -54,15 +67,13 @@ export class functionalGroup {
         let fullSMILES = this.SMILES;
 
         for (let i = 0; i < this.rGroups.length; i++) {
-
-            if (i == this.rGroups.length - 1) {
-                // handle non () case
-                fullSMILES += `${this.rGroups[i].toSmiles()}`;
-            }
-            else {
-                fullSMILES += `(${this.rGroups[i].toSmiles()})`;
-            }
+            // Always use () it causes less problems with Arenes
+            fullSMILES = fullSMILES.replace('?', `(${this.rGroups[i].toSmiles()})`);
         }
+
+        fullSMILES = fullSMILES.replaceAll('?', '')
+
+        console.log('inprogress', fullSMILES)
 
         return fullSMILES
     }
@@ -71,23 +82,99 @@ export class functionalGroup {
 
 export const newStartCarbon = () => {return new functionalGroup(
     'Starting Carbon',
-    'C',
+    'C????',
     4,
     1
 )}
 
 export const newSingleCarbon = () => {return new functionalGroup(
     'Single Carbon',
-    'C',
+    'C???',
     3, // account for being attached
-    1
+    1,
+    0.1,
 )}
 
 export const newDoubleCarbon = () => {return new functionalGroup(
     'Double Bond Carbon',
-    '=C',
+    '=C??',
     2,
-    2
+    2,
+    0.2,
+)}
+
+export const hydroxyl = () => {return new functionalGroup(
+    'Hydroxyl Group',
+    'O',
+    0,
+    1
+)}
+
+export const thiol = () => {return new functionalGroup(
+    'Thiol Group',
+    'S?',
+    1,
+    1,
+    0.5,
+)}
+
+export const hexaneRing = () => {
+    // to prevent ring numbering conflicts
+
+    const ringNumber = getRingNumber();
+
+    return new functionalGroup(
+    'Cyclohexane',
+    `C${ringNumber}?C??C??C??C??C${ringNumber}??`,
+    11,
+    1,
+    0.75,
+)}
+
+export const benzene = () => {
+
+    const ringNumber = getRingNumber();
+    
+    return new functionalGroup(
+    'Benzene Ring',
+    `C${ringNumber}=C?C?=C?C?=C${ringNumber}?`,
+    5,
+    1,
+    0.75
+)}
+
+export const cycloPropane = () => {
+
+    const ringNumber = getRingNumber();
+    
+    return new functionalGroup(
+    'Cyclo Propane',
+    `C${ringNumber}??C??C${ringNumber}??`,
+    6,
+    1,
+    0.9,
+)}
+
+export const epoxide = () => {
+
+    const ringNumber = getRingNumber();
+    
+    return new functionalGroup(
+    'Epoxide Triangle',
+    `C${ringNumber}??C??O${ringNumber}`,
+    4,
+    1,
+    0.9,
+)}
+
+export const amine = () => {
+    
+    return new functionalGroup(
+    'Amine',
+    `N??`,
+    2,
+    1,
+    0.2,
 )}
 
 export const generateLinearBackbone = (length: number, hydroProb: number): Array<functionalGroup> => {
@@ -97,19 +184,19 @@ export const generateLinearBackbone = (length: number, hydroProb: number): Array
     let backboneFuncGroups = [lastCarbon];
 
     for (let i = 0; i < length - 1; i++) {
-        if (!binaryChoice(hydroProb)) {
-            // Add double carbon
+        // if (!binaryChoice(hydroProb)) {
+        //     // Add double carbon
 
-            const next = newDoubleCarbon();
+        //     const next = newDoubleCarbon();
 
-            lastCarbon.attachFuncGroup(next)
+        //     lastCarbon.attachFuncGroup(next)
 
-            backboneFuncGroups.push(next);
+        //     backboneFuncGroups.push(next);
 
-            lastCarbon = next;
+        //     lastCarbon = next;
 
-        }
-        else {
+        // }
+        // else {
             // Add single carbon
             const next = newSingleCarbon();
 
@@ -118,7 +205,7 @@ export const generateLinearBackbone = (length: number, hydroProb: number): Array
             backboneFuncGroups.push(next);
 
             lastCarbon = next;
-        }
+        // }
     }
 
     return backboneFuncGroups
@@ -126,5 +213,12 @@ export const generateLinearBackbone = (length: number, hydroProb: number): Array
 
 export const allFuncGroups = [
     newSingleCarbon,
-    newDoubleCarbon,
+    // newDoubleCarbon,
+    hydroxyl,
+    thiol,
+    hexaneRing,
+    benzene,
+    cycloPropane,
+    epoxide,
+    amine,
 ]

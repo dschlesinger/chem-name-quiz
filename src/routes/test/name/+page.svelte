@@ -8,7 +8,8 @@
   import { failure, success, warning } from '$lib/components/custom/toasts.svelte';
 
   import { generateMolecule } from '$lib/kekuleUtils';
-  import { onMount, tick } from 'svelte';
+  import { onMount } from 'svelte';
+  import { type PreviousExample } from '$lib/components/custom/previousExampleCard/previousExampleObject';
 
   let previousExamples = $state({current: []});
 
@@ -23,17 +24,21 @@
 
   let isLoading = $state(true);
 
-  let getName = $derived(getSMILES.current ? (async () => {isLoading = true; const n = await getSMILES.current?.(); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
+  let getName = $derived(getSMILES.current ? (async (givenSMILES = undefined) => {isLoading = true; const n = await getSMILES.current?.(givenSMILES); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
 
   async function setupExample() {
 
     isLoading = true;
 
-    const SMILES = await generateMolecule();
+    let SMILES = await generateMolecule();
+    chemicalName.current = await getName(SMILES);
+
+    while (chemicalName.current == 'Not nameable :(') {
+      SMILES = await generateMolecule();
+      chemicalName.current = await getName(SMILES);
+    }
 
     await setSMILES?.current(SMILES);
-
-    chemicalName.current = await getName();
 
     isLoading = false;
   }
@@ -47,12 +52,15 @@
     
     console.log(processGuess, processCorrect, isCorrect);
 
-    if (isCorrect) {
-      success('Correct!')
+    let thisExample: PreviousExample = {
+      correct: isCorrect,
+      question_type: 'naming',
+      answer: chemicalName.current, // Correct cannonical SMILES or UIPAC name
+      guess: guessedName, // User inputed cannonical SMILES or UIPAC name
+      timeStamp: (new Date()).toISOString(), // Why not
     }
-    else {
-      failure('Incorrect :(')
-    }
+
+    previousExamples.current.push(thisExample);
 
   }
 
@@ -108,7 +116,7 @@
     <Button onclick={checkName}>
         Check Answer
     </Button>
-    <Input placeholder='UIPAC Name' bind:value={guessedName} />
+    <Input onkeypress={(e) => {if(e.key == 'Enter'){checkName()}}} placeholder='UIPAC Name' bind:value={guessedName} />
   </div>
 
 </div>

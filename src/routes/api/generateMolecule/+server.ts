@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { generateLinearBackbone, chooseRandom, allFuncGroups } from '$lib/functionalGroup';
 
 export const POST: RequestHandler = async ({ request }) => {
-    const { level = 1, numberFunctionalGroups = 5 }: 
+    const { level = 1, numberFunctionalGroups = 3 }: 
         { level: number, numberFunctionalGroups: number } = await request.json();
 
     // Probability of pulling a hydrogen instead of a functional group
@@ -39,7 +39,15 @@ export const POST: RequestHandler = async ({ request }) => {
 
         const funcGroupChoice = chooseRandom(allFuncGroups)();
 
-        const sucsessful = target.attachFuncGroup(funcGroupChoice);
+        let sucsessful = false;
+        // Do skip chance for victim, if level higher more weird structures
+        if (funcGroupChoice.skipChance > Math.random() ** level) {
+            // pass as it is not sucsessful
+        }
+
+        else {
+            sucsessful = target.attachFuncGroup(funcGroupChoice);
+        }
 
         if (sucsessful) {
             // Check that target has enough to stay in stack else pop
@@ -60,6 +68,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
     // Still works as linked, hopefully
     let SMILES = backbone[0].toSmiles()
+
+    console.log(SMILES)
 
     return json({ SMILES })
 

@@ -23,24 +23,18 @@
 
 <SvelteToast {options} />
 
-<div class='w-screen h-screen flex flex-col'>
-	<nav class='bg-slate-800'>
+<div class="w-screen h-screen flex flex-col">
+  <nav class="bg-slate-800">
+    <div class="flex justify-center gap-x-8">
+      {#each pages as page}
+        <div class="p-4">
+          <Button class="bg-blue-800" href={page.link}>{page.name}</Button>
+        </div>
+      {/each}
+    </div>
+  </nav>
 
-		<div class='flex justify-center gap-x-8'>
-			{#each pages as page}
-
-				<div class='p-4'>
-
-					<Button class='bg-blue-800' href={page.link}>{page.name}</Button>
-
-				</div>
-
-			{/each}
-		</div>
-
-	</nav>
-
-	<div class='flex-grow'>
-		{@render children?.()}
-	</div>
+  <div class="flex-1 flex flex-col min-h-0">
+    {@render children?.()}
+  </div>
 </div>

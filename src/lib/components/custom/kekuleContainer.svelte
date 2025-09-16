@@ -3,9 +3,7 @@
   import { browser } from '$app/environment';
 
   import { container } from '$lib/components/custom/container.svelte';
-  import Button from '../ui/button/button.svelte';
   import { success, warning, failure } from '$lib/components/custom/toasts.svelte';
-  import { fail } from '@sveltejs/kit';
 
   // Loading RDKit
   let RDKit = null;
@@ -99,26 +97,36 @@
       const molecule = Kekule.IO.loadFormatData(molData, 'mol');
 
       composer.setChemObj(molecule);
+
     }
 
     // Define get SMILES function
-    getSMILES.current = async () => {
+    getSMILES.current = async (givenSMILES = undefined) => {
 
-      // Should only be one molecule, return null if more or less
-      const molecules = composer.exportObjs(Kekule.Molecule);
+      let SMILES;
 
-      if (molecules.length !== 1) {
+      if (!givenSMILES) {
 
-        failure(`Found ${molecules.length} molecules, only works with 1`);
-        return
+        // Should only be one molecule, return null if more or less
+        const molecules = composer.exportObjs(Kekule.Molecule);
+
+        if (molecules.length !== 1) {
+
+          failure(`Found ${molecules.length} molecules, only works with 1`);
+          return
+        }
+
+        SMILES = Kekule.IO.saveFormatData(molecules[0], 'smi');
+
+        if (SMILES.length == 0) {
+
+          failure(`SMILES is empty :(`);
+          return
+        }
       }
-
-      const SMILES = Kekule.IO.saveFormatData(molecules[0], 'smi');
-
-      if (SMILES.length == 0) {
-
-        failure(`SMILES is empty :(`);
-        return
+      else {
+        // SMILES is passed in just return name for checking if it is nameable
+        SMILES = givenSMILES;
       }
 
       const response = await fetch(
