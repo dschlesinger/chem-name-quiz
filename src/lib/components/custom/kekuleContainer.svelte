@@ -48,7 +48,8 @@
     chemicalName = $bindable(), 
     getSMILES = $bindable({current: undefined}), 
     clearSMILES = $bindable({current: undefined}), 
-    setSMILES = $bindable({current: undefined}) 
+    setSMILES = $bindable({current: undefined}),
+    isEqual = $bindable({current: undefined}),
   } = $props();
 
 
@@ -69,6 +70,28 @@ const { Kekule } = await import('kekule');
     composer.appendToElem(container.current);
     }
 
+    isEqual.current = async (SMILES: string) => {
+      // Takes generated smiles from draw and compares it with kekule
+
+      const molecules = composer.exportObjs(Kekule.Molecule);
+
+        if (molecules.length !== 1) {
+
+          failure(`Found ${molecules.length} molecules, only works with 1`);
+          return
+        }
+
+      const DrawnMol = molecules[0];
+
+      // Load RDKit
+
+      if (!RDKit) await loadRDKit();
+
+      const GivenMol = Kekule.IO.loadFormatData(RDKit.get_mol(SMILES).get_molblock(), 'mol');
+
+      return DrawnMol.isSameStructureWith(GivenMol);
+    }
+
     clearSMILES.current = async () => {
 
       // Only works for kekule
@@ -82,6 +105,7 @@ const { Kekule } = await import('kekule');
       if (!RDKit) await loadRDKit();
 
       const mol = RDKit.get_mol(SMILES);
+
 
       currentSMILES.current = SMILES;
 
@@ -173,7 +197,7 @@ const { Kekule } = await import('kekule');
   });
 </script>
 
-<div class='flex rounded-md items-center justify-center bg-slate-200' style={`width: ${width}; height: ${height};`} >
+<div class='flex rounded-md overflow-hidden items-center justify-center bg-slate-200' style={`width: ${width}; height: ${height};`} >
 
   {#if !loadedContainer}
   <div class='flex flex-col items-center gap-y-4'>
@@ -185,11 +209,11 @@ const { Kekule } = await import('kekule');
 
   {/if}
   {#if veiwProvider == 'kekule'}
-  <div 
-    style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
-    bind:this={container.current}
-  >
-  </div>
+    <div 
+      style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`} 
+      bind:this={container.current}
+    >
+    </div>
   {:else}
   <!-- rdkit -->
   <div class='rounded-md overflow-hidden' id="rdkit-svg-provider" style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`}>

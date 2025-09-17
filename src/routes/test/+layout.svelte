@@ -1,10 +1,10 @@
 <script lang='ts'>
-    import { page } from '$app/state';
+    import { previousExamples } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
     import PreviousExampleCard from '$lib/components/custom/previousExampleCard/previousExampleCard.svelte';
 
     const { children } = $props();
 
-    let previousExamples = $derived(page.data?.previousExamples?.current ?? []);
+    let previousExamplesCurrent = $derived(previousExamples?.current ?? []);
 </script>
 
 <div class='h-full w-full flex'>
@@ -18,7 +18,7 @@
         </header>
 
         <div class='flex-1 overflow-auto items-center gap-y-2 flex flex-col'>
-            {#each previousExamples as PE}
+            {#each previousExamplesCurrent as PE}
                 <PreviousExampleCard previousExample={PE} />
             {/each}
         </div>

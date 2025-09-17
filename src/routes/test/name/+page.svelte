@@ -1,7 +1,6 @@
 <script lang='ts'>
 
-  import { page } from '$app/state';
-  import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
+import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { Input } from "$lib/components/ui/input/index.js";
   import { Circle } from 'svelte-loading-spinners';
@@ -9,12 +8,7 @@
 
   import { generateMolecule } from '$lib/kekuleUtils';
   import { onMount } from 'svelte';
-  import { type PreviousExample } from '$lib/components/custom/previousExampleCard/previousExampleObject';
-
-  let previousExamples = $state({current: []});
-
-  // Pass to layout for side bar
-  page.data.previousExamples = previousExamples;
+  import { type PreviousExample, previousExamples } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
 
   let chemicalName = $state({current: ''});
   let getSMILES = $state({current: null})
@@ -60,24 +54,29 @@
       timeStamp: (new Date()).toISOString(), // Why not
     }
 
-    previousExamples.current.push(thisExample);
+    previousExamples.name.push(thisExample);
 
   }
 
   onMount(async () => {
 
-    const checkVariable = async () => {
+    previousExamples.current = previousExamples.name
+
+    // Wait for Kekule Container to load 
+    const setupTimeout = async () => {
     if (setSMILES.current) {
         await setupExample();
       } else {
 
         // 10 ms wait
         await new Promise(resolve => setTimeout(resolve, 10));
-        await checkVariable();
+        await setupTimeout();
       }
     };
 
-    await checkVariable();
+    await setupTimeout();
+
+    // Set current examples to this page
   })
 
   // let onclickGetName = $derived(getSMILES.current ? (async () => {isLoading = true; await getSMILES.current?.(); isLoading = false;}) : (async () => {warning('Naming function is not loaded')}));

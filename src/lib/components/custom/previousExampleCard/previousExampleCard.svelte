@@ -1,6 +1,6 @@
 <script lang='ts'>
 
-    import { type PreviousExample } from '$lib/components/custom/previousExampleCard/previousExampleObject';
+    import { type PreviousExample } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
 
     const { previousExample } : {previousExample: PreviousExample} = $props();
 </script>
