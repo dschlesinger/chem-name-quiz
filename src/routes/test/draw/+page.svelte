@@ -1,7 +1,7 @@
 <script lang='ts'>
 
     import KekuleViewer from "$lib/components/custom/kekuleContainer.svelte";
-    import { type PreviousExample, previousExamples } from "$lib/components/custom/previousExampleCard/previousExampleObject.svelte";
+    import { type PreviousExample, previousExamples, currentPage } from "$lib/components/custom/previousExampleCard/previousExampleObject.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import { onMount } from "svelte";
@@ -10,6 +10,7 @@
 
     let chemicalName = $state({current: ''});
     let getSMILES = $state({current: null})
+    let getUIPAC = $state({current: null})
     let setSMILES = $state({current: null})
     let clearSMILES = $state({current: null})
     let isEqual = $state({current: null})
@@ -31,13 +32,28 @@
       return name
     }
 
-    async function checkDrawing() {
+    const checkDrawing = async () => {
 
-      console.log(
-        await isEqual.current(
-          generatedSMILES.current
-        )
-      )
+      const drawnSMILES = await getSMILES.current?.();
+
+      console.log(drawnSMILES)
+
+      if (!drawnSMILES || drawnSMILES == '') {
+        return
+      }
+
+      const isCorrect = await isEqual.current(generatedSMILES.current);
+      
+      let thisExample: PreviousExample = {
+        correct: isCorrect,
+        question_type: 'drawing',
+        info: generatedUIPAC.current,
+        answer: generatedSMILES.current, // Correct cannonical SMILES or UIPAC name
+        guess: drawnSMILES, // User inputed cannonical SMILES or UIPAC name
+        timeStamp: (new Date()).toISOString(), // Why not
+      }
+      
+      previousExamples.draw.push(thisExample);
 
     }
 
@@ -52,12 +68,18 @@
       generatedSMILES.current = await generateMolecule();
       generatedUIPAC.current = await getName(generatedSMILES.current);
 
+      while (generatedUIPAC.current == null) {
+        generatedSMILES.current = await generateMolecule();
+        generatedUIPAC.current = await getName(generatedSMILES.current);
+      }
+
       isLoading = false;
     }
 
     onMount(async () => {
 
         previousExamples.current = previousExamples.draw
+        currentPage.current = 'drawing'
 
         // Wait for Kekule Container to load 
         const setupTimeout = async () => {
@@ -95,6 +117,7 @@
           veiwProvider='kekule' 
           bind:chemicalName 
           bind:getSMILES 
+          bind:getUIPAC 
           bind:setSMILES 
           bind:clearSMILES
           bind:isEqual
@@ -104,13 +127,13 @@
       </div>
       <div class='flex-1 flex flex-col gap-y-4 items-center'>
         <!-- Generate new -->
-         <Button onclick={setupExample}>
+         <Button class='bg-yellow-600 hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
           Generate New
         </Button>
-         <Button onclick={clearSMILES.current}>
+         <Button class='bg-red-600 hover:bg-red-600 hover:opacity-75' onclick={clearSMILES.current}>
           Clear Canvas
         </Button>
-        <Button onclick={checkDrawing}>
+        <Button class='bg-green-600 hover:bg-green-600 hover:opacity-75' onclick={checkDrawing}>
           Check Answer
         </Button>
       </div>

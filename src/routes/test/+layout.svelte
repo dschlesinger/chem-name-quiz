@@ -1,5 +1,5 @@
 <script lang='ts'>
-    import { previousExamples } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
+    import { previousExamples, currentPage } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
     import PreviousExampleCard from '$lib/components/custom/previousExampleCard/previousExampleCard.svelte';
 
     const { children } = $props();
@@ -19,7 +19,7 @@
 
         <div class='flex-1 overflow-auto items-center gap-y-2 flex flex-col'>
             {#each previousExamplesCurrent as PE}
-                <PreviousExampleCard previousExample={PE} />
+                <PreviousExampleCard cardType={currentPage.current} previousExample={PE} />
             {/each}
         </div>
     </aside>

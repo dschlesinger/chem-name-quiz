@@ -12,7 +12,6 @@
   let RDKit = null;
   let isLoadingRDKit = false;
   let rdkitSVG = $state('');
-  $inspect(rdkitSVG);
 
   // Works by appending the RDKit CDN
   async function loadRDKit() {
@@ -31,7 +30,6 @@
                 
                 RDKit = await window.initRDKitModule();
             } catch (error) {
-                console.error('Failed to load RDKit:', error);
             }
             isLoadingRDKit = false;
         }
@@ -47,6 +45,7 @@
     height = '400px',
     chemicalName = $bindable(), 
     getSMILES = $bindable({current: undefined}), 
+    getUIPAC = $bindable({current: undefined}), 
     clearSMILES = $bindable({current: undefined}), 
     setSMILES = $bindable({current: undefined}),
     isEqual = $bindable({current: undefined}),
@@ -56,7 +55,7 @@
   onMount(async () => {
 
     if (veiwProvider == 'kekule') {
-const { Kekule } = await import('kekule');
+    const { Kekule } = await import('kekule');
 
     console.log('Kekule version:', Kekule.VERSION);
 
@@ -155,6 +154,11 @@ const { Kekule } = await import('kekule');
         }
       }
 
+      return SMILES
+
+    }
+
+    getUIPAC.current = async (SMILES) => {
       const response = await fetch(
         '/api/nameChemicals',
         {
@@ -171,7 +175,6 @@ const { Kekule } = await import('kekule');
       chemicalName.current = trueName;
 
       return trueName;
-
     }
 
     if (veiwProvider == 'kekule'){

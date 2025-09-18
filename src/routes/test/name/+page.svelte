@@ -1,6 +1,6 @@
 <script lang='ts'>
 
-import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
+  import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { Input } from "$lib/components/ui/input/index.js";
   import { Circle } from 'svelte-loading-spinners';
@@ -8,23 +8,25 @@ import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
 
   import { generateMolecule } from '$lib/kekuleUtils';
   import { onMount } from 'svelte';
-  import { type PreviousExample, previousExamples } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
+  import { type PreviousExample, previousExamples, currentPage } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
 
   let chemicalName = $state({current: ''});
   let getSMILES = $state({current: null})
+  let getUIPAC = $state({current: null})
   let setSMILES = $state({current: null})
   let clearSMILES = $state({current: null})
   let guessedName = $state('');
+  let SMILES = $state('');
 
   let isLoading = $state(true);
 
-  let getName = $derived(getSMILES.current ? (async (givenSMILES = undefined) => {isLoading = true; const n = await getSMILES.current?.(givenSMILES); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
+  let getName = $derived(getUIPAC.current ? (async (givenSMILES = undefined) => {isLoading = true; const n = await getUIPAC.current?.(givenSMILES); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
 
   async function setupExample() {
 
     isLoading = true;
 
-    let SMILES = await generateMolecule();
+    SMILES = await generateMolecule();
     chemicalName.current = await getName(SMILES);
 
     while (chemicalName.current == 'Not nameable :(') {
@@ -43,12 +45,11 @@ import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
     const processCorrect = chemicalName.current.toLowerCase().replaceAll(' ', '');
     
     const isCorrect =  processCorrect == processGuess;
-    
-    console.log(processGuess, processCorrect, isCorrect);
 
     let thisExample: PreviousExample = {
       correct: isCorrect,
       question_type: 'naming',
+      info: SMILES,
       answer: chemicalName.current, // Correct cannonical SMILES or UIPAC name
       guess: guessedName, // User inputed cannonical SMILES or UIPAC name
       timeStamp: (new Date()).toISOString(), // Why not
@@ -61,6 +62,7 @@ import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
   onMount(async () => {
 
     previousExamples.current = previousExamples.name
+    currentPage.current = 'naming'
 
     // Wait for Kekule Container to load 
     const setupTimeout = async () => {
@@ -93,19 +95,18 @@ import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
       <div class='flex-1'>
       </div>
       <div class='justify-center'>
-        <KekuleViewer veiwProvider='rdkit' bind:chemicalName bind:getSMILES bind:setSMILES bind:clearSMILES
+        <KekuleViewer veiwProvider='rdkit' bind:chemicalName bind:getSMILES bind:setSMILES bind:clearSMILES bind:getUIPAC
           width='500px'
           height='300px'
         />
       </div>
       <div class='flex-1'>
         <!-- Generate new -->
-         <Button onclick={setupExample} disabled={isLoading}>
-
+         <Button class='bg-yellow-600 hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
           {#if isLoading}
             <Circle size="1" color="#EEE" unit="rem" />
           {:else}
-            New Molecule
+            Generate New
           {/if}
         </Button>
       </div>

@@ -19,11 +19,6 @@ function handleSMILES(Kekule, SMILES: String, previousAtom = undefined) {
     }
 }
 
-export function SMILEStoKekule(Kekule, SMILES: String) {
-
-    let mol = new Kekule.Molecule();
-
-}
 
 export async function generateMolecule() {
         
