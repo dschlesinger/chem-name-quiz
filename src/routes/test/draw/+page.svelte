@@ -34,7 +34,7 @@
 
     const checkDrawing = async () => {
 
-      const drawnSMILES = await getSMILES.current?.();
+      let drawnSMILES = await getSMILES.current?.();
 
       console.log(drawnSMILES)
 

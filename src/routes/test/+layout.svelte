@@ -4,7 +4,7 @@
 
     const { children } = $props();
 
-    let previousExamplesCurrent = $derived(previousExamples?.current ?? []);
+    let previousExamplesCurrent = $derived(previousExamples?.current.toReversed() ?? []);
 </script>
 
 <div class='h-full w-full flex'>
