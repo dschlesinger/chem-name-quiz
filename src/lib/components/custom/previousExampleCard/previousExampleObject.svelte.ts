@@ -11,3 +11,6 @@ export interface PreviousExample {
 export let previousExamples = $state({current: [], name: [], draw: []});
 
 export let currentPage = $state({current: undefined})
+
+export let isPreviousExample = $state({current: false, name: false, draw: false});
+export let currentPreviousExample = $state({current: undefined, name: undefined, draw: undefined});

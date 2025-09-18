@@ -1,7 +1,8 @@
 <script lang='ts'>
 
     import KekuleViewer from "$lib/components/custom/kekuleContainer.svelte";
-    import { type PreviousExample, previousExamples, currentPage } from "$lib/components/custom/previousExampleCard/previousExampleObject.svelte";
+    import PreviousExampleCard from "$lib/components/custom/previousExampleCard/previousExampleCard.svelte";
+    import { type PreviousExample, previousExamples, currentPage, isPreviousExample, currentPreviousExample } from "$lib/components/custom/previousExampleCard/previousExampleObject.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import Input from "$lib/components/ui/input/input.svelte";
     import { onMount } from "svelte";
@@ -80,6 +81,8 @@
 
         previousExamples.current = previousExamples.draw
         currentPage.current = 'drawing'
+        isPreviousExample.current = isPreviousExample.draw
+        currentPreviousExample.current = currentPreviousExample.draw
 
         // Wait for Kekule Container to load 
         const setupTimeout = async () => {
@@ -101,6 +104,13 @@
 
 <div class='h-full flex flex-col gap-y-4 justify-center items-center bg-slate-400'>
 
+  {#if isPreviousExample.draw}
+    <div class='bg-slate-500 p-4 rounded-md'>
+
+      <PreviousExampleCard expanded={true} cardType='drawing' previousExample={currentPreviousExample.draw} />
+
+    </div>
+  {:else}
   <div class='bg-slate-700 rounded-md p-4 text-white text-xl font-bold'>
     Draw this Molecule!
   </div>
@@ -138,5 +148,6 @@
         </Button>
       </div>
   </div>
+  {/if}
 
 </div>

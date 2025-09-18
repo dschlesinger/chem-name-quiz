@@ -1,6 +1,7 @@
 <script lang='ts'>
 
   import KekuleViewer from '$lib/components/custom/kekuleContainer.svelte';
+  import PreviousExampleCard from '$lib/components/custom/previousExampleCard/previousExampleCard.svelte';
   import Button from '$lib/components/ui/button/button.svelte';
   import { Input } from "$lib/components/ui/input/index.js";
   import { Circle } from 'svelte-loading-spinners';
@@ -8,7 +9,7 @@
 
   import { generateMolecule } from '$lib/kekuleUtils';
   import { onMount } from 'svelte';
-  import { type PreviousExample, previousExamples, currentPage } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
+  import { type PreviousExample, previousExamples, currentPage, isPreviousExample, currentPreviousExample } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
 
   let chemicalName = $state({current: ''});
   let getSMILES = $state({current: null})
@@ -20,7 +21,7 @@
 
   let isLoading = $state(true);
 
-  let getName = $derived(getUIPAC.current ? (async (givenSMILES = undefined) => {isLoading = true; const n = await getUIPAC.current?.(givenSMILES); isLoading = false; return n;}) : (async () => {warning('Naming function is not loaded')}));
+  let getName = $derived(getUIPAC.current ? (async (givenSMILES = undefined) => {const n = await getUIPAC.current?.(givenSMILES); return n;}) : (async () => {warning('Naming function is not loaded')}));
 
   async function setupExample() {
 
@@ -63,6 +64,8 @@
 
     previousExamples.current = previousExamples.name
     currentPage.current = 'naming'
+    isPreviousExample.current = isPreviousExample.name
+    currentPreviousExample.current = currentPreviousExample.name
 
     // Wait for Kekule Container to load 
     const setupTimeout = async () => {
@@ -87,6 +90,13 @@
 
 <div class='h-full flex flex-col gap-y-4 justify-center items-center bg-slate-400'>
 
+  {#if isPreviousExample.name}
+    <div class='bg-slate-500 p-4 rounded-md'>
+
+      <PreviousExampleCard expanded={true} cardType='naming' previousExample={currentPreviousExample.name} />
+
+    </div>
+  {:else}
   <div class='bg-slate-700 rounded-md p-4 text-white text-xl font-bold'>
     What's it's Name?
   </div>
@@ -113,10 +123,11 @@
   </div>
 
   <div class='flex gap-x-5'>
-    <Button onclick={checkName}>
+    <Button class='bg-green-600 hover:bg-green-600 hover:opacity-75' onclick={checkName}>
         Check Answer
     </Button>
     <Input onkeypress={(e) => {if(e.key == 'Enter'){checkName()}}} placeholder='UIPAC Name' bind:value={guessedName} />
   </div>
+  {/if}
 
 </div>

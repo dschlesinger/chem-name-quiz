@@ -1,6 +1,7 @@
 <script lang='ts'>
     import { previousExamples, currentPage } from '$lib/components/custom/previousExampleCard/previousExampleObject.svelte';
     import PreviousExampleCard from '$lib/components/custom/previousExampleCard/previousExampleCard.svelte';
+    import Button from '$lib/components/ui/button/button.svelte';
 
     const { children } = $props();
 

@@ -3,18 +3,20 @@
   import Button from '$lib/components/ui/button/button.svelte';
   import { warning } from '$lib/components/custom/toasts.svelte';
   import { Circle } from 'svelte-loading-spinners';
+    import { get } from 'svelte/store';
 
   let chemicalName = $state({current: ''});
+  let getUIPAC = $state({current: null})
   let getSMILES = $state({current: null})
 
    let isLoading = $state(false);
 
-  let onclickGetName = $derived(getSMILES.current ? (async () => {isLoading = true; await getSMILES.current?.(); isLoading = false;}) : (async () => {warning('Naming function is not loaded')}));
+  let onclickGetName = $derived(getUIPAC.current ? (async () => {isLoading = true; await getUIPAC.current?.(await getSMILES?.current()); isLoading = false;}) : (async () => {warning('Naming function is not loaded')}));
 
 </script>
 
 <div class='flex flex-col gap-y-4 items-center'>
-  <KekuleViewer bind:chemicalName bind:getSMILES />
+  <KekuleViewer bind:chemicalName bind:getSMILES bind:getUIPAC />
 
   <div class='flex gap-x-5'>
     <Button onclick={onclickGetName} disabled={isLoading}>
