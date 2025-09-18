@@ -96,8 +96,6 @@ $effect(async () => {
     }
 });
 
-const backgroundClass = previousExample.correct ? 'bg-green-500' : 'bg-red-500';
-const svgBackgroundClass = previousExample.correct ? 'bg-green-600' : 'bg-red-600';
 const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCString();
 </script>
 
@@ -106,7 +104,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
         <button 
             type="button" 
             onclick={handleClick} 
-            class="hover:outline-3 hover:outline-orange-400 hover:opacity-70 rounded-md m-1 flex w-64 min-h-24 h-24 {backgroundClass}"
+            class="{previousExample.correct ? 'bg-green-600' : 'bg-red-600'} hover:outline-3 hover:outline-orange-400 hover:opacity-70 rounded-md m-1 flex w-64 min-h-24 h-24"
         >
             <div class="flex flex-col justify-around flex-1 p-2">
                 <div class="text-sm">Correct: {previousExample.answer}</div>
@@ -143,7 +141,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
                 <h4>vs.</h4>
             </div>
 
-            <div class="p-0.5 {svgBackgroundClass} rounded-md overflow-hidden w-20 h-full flex items-center justify-center">
+            <div class="p-0.5 {previousExample.correct ? 'bg-green-600' : 'bg-red-600'} rounded-md overflow-hidden w-20 h-full flex items-center justify-center">
                 {#if isLoadingSVG}
                     <Circle size="2" color="#EEE" unit="rem" />
                 {:else}
@@ -167,7 +165,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
                 {/if}
             </div>
 
-            <div class="{svgBackgroundClass} p-2 rounded-md">
+            <div class="{previousExample.correct ? 'bg-green-600' : 'bg-red-600'} p-2 rounded-md">
                 You said: {previousExample.guess}
             </div>
 
@@ -202,7 +200,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
                     <h4>vs.</h4>
                 </div>
 
-                <div class="p-0.5 {svgBackgroundClass} rounded-md overflow-hidden h-full flex items-center justify-center">
+                <div class="{previousExample.correct ? 'bg-green-600' : 'bg-red-600'} p-0.5 rounded-md overflow-hidden h-full flex items-center justify-center">
                     {#if isLoadingSVG}
                         <Circle size="2" color="#EEE" unit="rem" />
                     {:else}
