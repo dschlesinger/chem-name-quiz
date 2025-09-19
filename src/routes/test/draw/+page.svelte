@@ -119,10 +119,20 @@
     <div>{generatedUIPAC.current ? generatedUIPAC.current : 'Loading ...'}</div>
   </div>
 
-  <div class='flex items-center gap-x-4 w-full justify-around'>
-      <div class='flex-1'>
+  <div class='flex flex-col md:flex-row items-center gap-y-2 md:gap-x-4 w-full justify-around'>
+      <div class='flex-1 hidden invisible md:block'>
+        <!-- to center -->
+        <Button class='bg-yellow-600 hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
+          Generate New
+        </Button>
+         <Button class='bg-red-600 hover:bg-red-600 hover:opacity-75' onclick={clearSMILES.current}>
+          Clear Canvas
+        </Button>
+        <Button class='bg-green-600 hover:bg-green-600 hover:opacity-75' onclick={checkDrawing}>
+          Check Answer
+        </Button>
       </div>
-      <div class='justify-center'>
+      <div class='flex justify-center w-[90%] md:w-auto h-full'>
         <KekuleViewer 
           veiwProvider='kekule' 
           bind:chemicalName 
@@ -135,7 +145,7 @@
           height='300px'
         />
       </div>
-      <div class='flex-1 flex flex-col gap-y-4 items-center'>
+      <div class='flex-1 flex md:flex-col md:px-4 gap-x-1 md:gap-y-4 md:items-center'>
         <!-- Generate new -->
          <Button class='bg-yellow-600 hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
           Generate New

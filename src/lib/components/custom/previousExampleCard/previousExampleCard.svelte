@@ -43,6 +43,8 @@ async function loadRDKit() {
     }
 }
 
+
+
 async function getRDKitSVG(SMILES: string): Promise<string> {
     return RDKit.get_mol(SMILES).get_svg('200', '200');
 }
@@ -154,7 +156,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
     {/if}
 {:else}
     {#if cardType === 'naming'}
-        <div class="flex flex-col items-center gap-y-2">
+        <div class="flex flex-col items-center gap-y-2 max-w-[100vw]">
             <div class="p-0.5 bg-gray-600 rounded-md overflow-hidden min-h-48 h-full flex items-center justify-center">
                 {#if isLoadingSVG}
                     <Circle size="2" color="#EEE" unit="rem" />
@@ -185,7 +187,7 @@ const timestamp = new Date(currentPreviousExample?.current?.timeStamp).toUTCStri
                 {previousExample.info}
             </div>
 
-            <div class="flex rounded-md overflow-hidden min-h-48 w-128 justify-between gap-x-2">
+            <div class="flex rounded-md overflow-hidden min-h-48 md:w-128 justify-between flex-col gap-y-2 md:flex-row md:gap-x-2">
                 <div class="p-0.5 bg-green-600 rounded-md overflow-hidden h-full flex items-center justify-center">
                     {#if isLoadingSVG}
                         <Circle size="2" color="#EEE" unit="rem" />

@@ -110,7 +110,7 @@
 
       if (veiwProvider == 'rdkit') {
 
-        rdkitSVG = mol.get_svg(width=width.replace('px', ''), height=height.replace('px', ''));
+        rdkitSVG = mol.get_svg(Math.min(Number(width.replace('px', '')), window.innerWidth * 0.9), height.replace('px', ''));
 
       }
       else {
@@ -219,7 +219,7 @@
     </div>
   {:else}
   <!-- rdkit -->
-  <div class='rounded-md overflow-hidden' id="rdkit-svg-provider" style={`display: ${loadedContainer ? 'visible' : 'none'}; width: ${width}; height: ${height};`}>
+  <div class='rounded-md overflow-hidden' style={`display: ${loadedContainer ? 'visible' : 'none'}`}>
     {@html rdkitSVG }
   </div>
   {/if}

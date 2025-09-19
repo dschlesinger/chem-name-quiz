@@ -101,18 +101,31 @@
     What's it's Name?
   </div>
 
-  <div class='flex items-center gap-x-4 w-full justify-around'>
-      <div class='flex-1'>
+  <div class='flex flex-col md:flex-row items-center gap-y-2 md:gap-x-4 w-full justify-around'>
+      <div class=' flex-1 hidden invisible md:block'>
+        <Button class='bg-yellow-600 px-4 flex justify-center hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
+          {#if isLoading}
+            <Circle size="1" color="#EEE" unit="rem" />
+          {:else}
+            Generate New
+          {/if}
+        </Button>
       </div>
-      <div class='justify-center'>
-        <KekuleViewer veiwProvider='rdkit' bind:chemicalName bind:getSMILES bind:setSMILES bind:clearSMILES bind:getUIPAC
+      <div class='flex w-[90%] md:w-auto justify-center h-full'>
+        <KekuleViewer 
+          veiwProvider='rdkit' 
+          bind:chemicalName 
+          bind:getSMILES 
+          bind:setSMILES 
+          bind:clearSMILES 
+          bind:getUIPAC
           width='500px'
           height='300px'
         />
       </div>
       <div class='flex-1'>
         <!-- Generate new -->
-         <Button class='bg-yellow-600 hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
+         <Button class='bg-yellow-600 px-4 flex justify-center hover:bg-yellow-600 hover:opacity-75' onclick={setupExample}>
           {#if isLoading}
             <Circle size="1" color="#EEE" unit="rem" />
           {:else}

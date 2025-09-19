@@ -13,7 +13,7 @@
         {@render children?.()}
     </div>
 
-    <aside class='bg-blue-950 max-w-96 min-w-72 ml-auto flex flex-col'>
+    <aside class='bg-blue-950 w-full md:w-auto md:max-w-96 md:min-w-72 ml-auto flex flex-col'>
         <header class='w-full p-4 text-center text-white font-bold bg-slate-700'>
             Previous Examples
         </header>
