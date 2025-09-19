@@ -8,7 +8,7 @@
     let previousExamplesCurrent = $derived(previousExamples?.current.toReversed() ?? []);
 </script>
 
-<div class='h-full w-full flex'>
+<div class='h-full w-full flex flex-col md:flex-row'>
     <div class='flex-1'>
         {@render children?.()}
     </div>

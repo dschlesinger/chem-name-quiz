@@ -16,7 +16,15 @@
 </script>
 
 <div class='flex flex-col gap-y-4 items-center'>
-  <KekuleViewer bind:chemicalName bind:getSMILES bind:getUIPAC />
+  <div class='flex justify-center w-full h-full [&>#kekule-container]:w-full [&>#kekule-container]:h-full [&>#kekule-container]:max-w-[100vw] [&>#kekule-container]:max-h-[100vh]'>
+    <KekuleViewer 
+      width="600px"
+      height="400px"
+      bind:chemicalName 
+      bind:getSMILES 
+      bind:getUIPAC 
+    />
+  </div>
 
   <div class='flex gap-x-5'>
     <Button onclick={onclickGetName} disabled={isLoading}>
