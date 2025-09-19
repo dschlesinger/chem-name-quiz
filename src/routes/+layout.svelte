@@ -3,6 +3,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { SvelteToast } from '@zerodevx/svelte-toast'
 	import Button from '$lib/components/ui/button/button.svelte';
+  import GoogleAnalytics from '$lib/components/custom/GoogleAnalytics.svelte';
 	
 	let { children } = $props();
 	let mobileMenuOpen = $state(false);
@@ -30,6 +31,7 @@
 </svelte:head>
 
 <SvelteToast {options} />
+<GoogleAnalytics />
 
 <div class="w-screen h-screen flex flex-col overflow-x-hidden overflow-y-auto">
   <nav class="bg-slate-800 relative">
