@@ -139,7 +139,7 @@
     <Button class='bg-green-600 hover:bg-green-600 hover:opacity-75' onclick={checkName}>
         Check Answer
     </Button>
-    <Input onkeypress={(e) => {if(e.key == 'Enter'){checkName()}}} placeholder='UIPAC Name' bind:value={guessedName} />
+    <Input onkeypress={(e) => {if(e.key == 'Enter'){checkName()}}} placeholder='IUPAC Name' bind:value={guessedName} />
   </div>
   {/if}
 
